@@ -3,27 +3,27 @@ import type { WritingContent } from "@/lib/types";
 export const writingZh: WritingContent = {
   pageTitle: "写作",
   intro:
-    "写作是我思考的一部分。我会写 LLM 系统、评测与能力测量、论文阅读，也会保留一部分更偏反思与文学表达的内容。",
+    "这里不是简单的文章归档，而是我用来组织技术判断、应用实践和文学创作的第二工作台。比起平铺罗列，我更希望它能按长期主题不断生长。",
   sections: {
-    categories: "写作分类",
+    categories: "写作主题",
     featured: "精选文章",
     series: "专题写作"
   },
   categories: [
     {
-      key: "tech-essays",
-      title: "技术文章",
-      description: "围绕后训练、Agent、工具使用与面向产品的 AI 系统展开的公开技术写作。"
+      key: "technical-writing",
+      title: "技术写作",
+      description: "围绕 LLM、Agent、评测、能力测量与方法论展开的结构化技术写作。"
     },
     {
-      key: "research-notes",
-      title: "研究札记",
-      description: "关于能力测量、结构化 OOD、construct validity 与 benchmark 设计的笔记。"
+      key: "applied-notes",
+      title: "应用 / 实践笔记",
+      description: "从真实系统、工作流、产品约束与落地问题中长出来的应用型文章。"
     },
     {
-      key: "literary-writing",
-      title: "文学 / 个人写作",
-      description: "作为第二层表达而保留的、经过筛选的反思与文学写作。"
+      key: "literary-creation",
+      title: "文学创作",
+      description: "作为另一条长期表达线保留的小说、散文、片段与反思写作。"
     }
   ],
   series: [
@@ -32,12 +32,14 @@ export const writingZh: WritingContent = {
       title: "Agent 能力测量笔记",
       description:
         "这个专题想讨论的，不是如何再做一个更难的 benchmark，而是一个更基础的问题：当模型在复杂任务上拿到高分时，我们到底能不能说，它真的具备了某种能力？我会沿着 benchmark design、construct validity、psychometrics、nomological networks、结构化 OOD 等线索，重新理解 LLM 与 Agent 的评测问题，并尝试把“任务成功”还原成“潜在能力测量”。后续也会结合 code agent 等具体场景，讨论如何把评测从刷榜推进到能力研究。",
+      category: "technical-writing",
       articles: [
         {
           slug: "measurement-view-1-score-is-not-capability",
           title: "测量观（一）：高分不等于高能力：复杂 Agent 评测，真正缺的不是更难的题",
           summary:
             "复杂 Agent 评测里最核心的问题，不是题目还不够难，而是我们能否把任务得分真正解释为潜在能力的证据。",
+          featured: true,
           content: [
             "这两年，Agent 很热，评测也越来越热。",
             "大家做了很多事：把任务拉长，把工具接进来，把环境做得更真，把 workflow 做得更像现实世界。于是我们看到越来越多 benchmark，不再只是几道静态题，而是一个可以调用工具、分步执行、甚至需要长期推进的任务系统。",
@@ -106,54 +108,101 @@ export const writingZh: WritingContent = {
     {
       slug: "agent-evaluation-as-diagnosis",
       title: "把 Agent 评测当作诊断，而不只是打分",
-      summary: "评测框架应该帮助定位失效模式，而不是只输出一个分数。",
-      category: "tech-essays",
-      featured: true
+      summary: "评测框架应该帮助定位失效模式，而不是只输出一个总分。",
+      category: "applied-notes",
+      featured: true,
+      content: [
+        "复杂 Agent 系统里，任务完成率当然重要，但它只告诉你“成没成”，很少告诉你“为什么成”或者“为什么没成”。如果评测只停在总分，它对系统优化的帮助其实很有限。",
+        "我更倾向把 Agent 评测当作一个诊断系统。也就是说，评测设计要能拆出失败发生在哪一层：是任务理解、计划分解、工具调用、状态维护，还是环境反馈处理出了问题。",
+        "一旦评测目标从“排个榜”转到“定位失效模式”，很多设计取舍就会变。你会更在意轨迹证据、error taxonomy、judge 与 verifier 的分工，以及失败案例能否回流到训练和 prompt 迭代里。",
+        "对真实系统来说，好的评测不是帮你宣布模型已经很强，而是帮你更快知道下一步该修哪里。只有这样，评测才真正进入优化闭环。"
+      ]
     },
     {
       slug: "what-coding-agents-learn-from-trajectories",
       title: "Coding Agent 从轨迹数据中真正学到了什么",
       summary: "关于监督信号、执行轨迹与模仿边界的一些思考。",
-      category: "tech-essays",
-      featured: true
+      category: "applied-notes",
+      featured: true,
+      content: [
+        "很多人会把轨迹数据直接理解成“更完整的监督”。但对 Coding Agent 来说，轨迹的价值并不只是更长，而在于它把决策过程、工具调用和环境反馈同时暴露了出来。",
+        "问题在于，轨迹里的可学习部分并不等于整条轨迹本身。模型可能学到局部决策模式、常见 repair path，或者某种 scaffold 下的行动节奏，但未必学到跨环境泛化的抽象能力。",
+        "所以我更关心两件事：第一，轨迹中哪些片段是可迁移的高价值信号；第二，这些信号是让模型学会了解题结构，还是只学会了某种模板化 workflow。",
+        "如果这两点不分开，轨迹数据看起来越丰富，越容易让人高估它带来的真实泛化收益。"
+      ]
     },
     {
       slug: "badcases-to-post-training-loops",
       title: "从 badcase 到后训练闭环",
       summary: "如何把真实业务失效转化为可训练、可评测的任务。",
-      category: "tech-essays"
+      category: "applied-notes",
+      content: [
+        "badcase 的价值不在于它能说明模型还不行，而在于它能成为下一轮优化的起点。真正关键的是，如何把零散失败翻译成可复现、可执行、可对比的任务表达。",
+        "这通常需要几步转换：先做失败归因，再抽出任务 schema，然后把环境、约束和判分规则补齐，最后接进训练或评测链路。少任何一步，badcase 都很容易只停留在人工复盘层面。",
+        "一旦 badcase 能进入 sandbox replay，它就不再只是一个案例，而会变成一个反复可调用的系统资产。你可以用它做 prompt 修补、数据构造、模型回归测试，甚至做 OOD 验证。",
+        "所以 badcase 驱动的后训练，本质上不是“收集更多失败”，而是“把失败工程化”。"
+      ]
     },
     {
       slug: "beyond-leaderboard-capability-measurement",
       title: "超越排行榜：关于能力测量的笔记",
       summary: "关于 validity、证据与 benchmark 真正想说明什么。",
-      category: "research-notes",
-      featured: true
+      category: "technical-writing",
+      featured: true,
+      content: [
+        "排行榜很有用，它提供了一个快速可见的比较界面。但排行榜天然擅长压缩复杂性，而能力研究真正需要的，往往恰恰是把复杂性重新展开。",
+        "当我们说一个 benchmark 在测“推理”“规划”或者“Agent 能力”时，这其实不是一句中性描述，而是一个测量声明。这个声明需要证据支撑，而不是只靠任务表现看起来像。",
+        "也正因为如此，我越来越觉得 benchmark 的讨论不能只停留在工程搭建和题目设计上。我们还需要问：它到底代表什么构念？哪些证据支持这个判断？又有哪些替代解释没有被排除？",
+        "如果这些问题不被认真处理，分数越高，结论反而可能越虚。"
+      ]
     },
     {
       slug: "structured-ood-and-behavior-evidence",
       title: "Agent 评测中的结构化 OOD 与行为证据",
       summary: "如何从迁移、分布错位与可观察行为来思考评测设计。",
-      category: "research-notes"
+      category: "technical-writing",
+      content: [
+        "OOD 不是一个统一概念。对 Agent 来说，目标变化、工具变化、环境变化、约束变化，往往分别对应着不同类型的泛化要求。",
+        "如果不把这些变化结构化，只说“模型在 OOD 上表现如何”，信息量其实很有限。因为你不知道模型失败的到底是规划、适配、记忆维护，还是对某种接口假设的依赖。",
+        "我更倾向把 OOD 设计成一组有解释力的结构化扰动。这样一来，评测结果不只是告诉你模型退化了多少，还能告诉你它到底在哪类变化下最脆弱。",
+        "真正有用的 OOD 评测，不是追求更难，而是追求更可解释。"
+      ]
     },
     {
       slug: "construct-validity-for-llm-benchmarks",
       title: "LLM Benchmark 的 Construct Validity",
       summary: "一个 benchmark 声称自己测到了什么，这件事需要被说清楚。",
-      category: "research-notes"
+      category: "technical-writing",
+      content: [
+        "Construct validity 之所以重要，是因为 benchmark 分数本身不会替你自动完成能力解释。任务得分只是观察值，构念才是你真正想说的那个对象。",
+        "这中间一旦缺少论证，研究就很容易出现一个常见问题：任务设计、评分方式和最终能力结论之间的链条并不牢靠。",
+        "很多 LLM benchmark 之所以争议越来越大，不是因为任务没用，而是因为大家开始意识到：高分不天然等于高能力，尤其当能力标签本身很宏大时更是如此。",
+        "所以 construct validity 不是附加的学术洁癖，而是决定 benchmark 结论能不能站得住的基础条件。"
+      ]
     },
     {
       slug: "selected-reflective-essay",
-      title: "一篇反思性文章",
+      title: "缓慢的句子",
       summary: "与技术写作并行存在的另一种节奏。",
-      category: "literary-writing",
-      featured: true
+      category: "literary-creation",
+      featured: true,
+      content: [
+        "有时候我会觉得，写技术文章像是在搭桥，要把模糊的判断从此岸送到彼岸；而文学写作更像是在河里停下来，看水到底往哪里去。",
+        "它不要求立刻给出一个结论，也不急着证明自己有用。它允许句子在纸上慢一点，允许一个念头先以气味、温度和某种模糊的形状出现。",
+        "也正因为这样，文学写作对我不是技术工作的对立面，反而像是一种校准。它提醒我，语言不只是用来压缩信息，也用来保留那些暂时还不适合被过快归纳的东西。",
+        "很多时候，一个人真正稳定下来的判断，未必诞生于最锋利的论证，而可能先诞生于一段被认真写下来的缓慢句子。"
+      ]
     },
     {
       slug: "fragment-and-prose-note",
-      title: "一则文学片段",
+      title: "夜里的窗口",
       summary: "短篇散文与片段式记录。",
-      category: "literary-writing"
+      category: "literary-creation",
+      content: [
+        "夜里十点以后，楼下便利店的灯光会把窗边那一小块墙照得很亮，像有人把一张纸贴在黑暗里。",
+        "有时我写到一半抬头，会看见那块亮面静静停着。它不说话，也不催促，只是提醒我：还有一些没有说完的话，可以继续慢慢写。",
+        "城市的声音在这个时刻会退到很远，只剩键盘、风和偶尔经过的脚步声。句子也是在这种时候，才像真正属于自己。"
+      ]
     }
   ]
 };

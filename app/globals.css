@@ -652,6 +652,28 @@ main {
   color: var(--muted);
 }
 
+.article-card__actions {
+  margin-top: 1.2rem;
+}
+
+.article-reference {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1.2rem;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--border);
+}
+
+.article-reference__link {
+  color: var(--foreground);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.article-reference__link:hover {
+  color: var(--accent);
+}
+
 .pill {
   display: inline-flex;
   padding: 0.28rem 0.55rem;
@@ -705,6 +727,43 @@ main {
   font-size: 0.76rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.essay-shell {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.4rem);
+}
+
+.essay-shell__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.essay-shell__meta-item {
+  min-width: 11rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.essay-shell__meta-item div {
+  color: var(--muted-strong);
+}
+
+.prose-flow {
+  display: grid;
+  gap: 1rem;
+}
+
+.prose-flow p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 1.08rem;
+  line-height: 1.9;
 }
 
 .site-footer {
@@ -813,6 +872,10 @@ main {
   }
 
   .timeline-card__meta {
+    flex-direction: column;
+  }
+
+  .essay-shell__meta {
     flex-direction: column;
   }
 

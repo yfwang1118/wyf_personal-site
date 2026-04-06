@@ -1,6 +1,9 @@
+import type { Route } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/content";
 import { isValidLocale, type Locale } from "@/lib/i18n";
+import { getWritingArticle, getWritingHref } from "@/lib/writing";
 
 export default async function WorkPage({
   params
@@ -16,6 +19,9 @@ export default async function WorkPage({
   const locale = lang as Locale;
   const dictionary = getDictionary(locale);
   const currentRole = dictionary.work.roles[0];
+  const relatedWriting = dictionary.profile.selectedWork
+    .map((item) => (item.relatedWritingSlug ? getWritingArticle(dictionary.writing, item.relatedWritingSlug) : undefined))
+    .filter((article) => article !== undefined);
   const copy =
     locale === "en"
       ? {
@@ -32,7 +38,13 @@ export default async function WorkPage({
           outcomesEyebrow: "Outcomes and skills",
           outcomesTitle: "What this work has been building toward",
           outcomesCopy:
-            "Across roles, the recurring goal has been to make model improvement more diagnosable, more operational, and closer to real production behavior."
+            "Across roles, the recurring goal has been to make model improvement more diagnosable, more operational, and closer to real production behavior.",
+          writingEyebrow: "Related writing",
+          writingTitle: "Essays that come directly out of the work",
+          writingCopy:
+            "I want work and writing to connect. These pieces are where the implementation details are translated into reusable arguments.",
+          writingButton: "Read article",
+          browseWriting: "Browse writing"
         }
       : {
           overview: "工作",
@@ -45,7 +57,12 @@ export default async function WorkPage({
           rolesCopy: "我做得最多的，是把业务里的模糊需求吸收到系统里，再翻译成可复现、可迭代的技术闭环。",
           outcomesEyebrow: "产出与能力",
           outcomesTitle: "这些工作最终在往哪里积累",
-          outcomesCopy: "跨不同角色，一条主线始终没变：让模型优化更可诊断、更工程化，也更贴近真实生产行为。"
+          outcomesCopy: "跨不同角色，一条主线始终没变：让模型优化更可诊断、更工程化，也更贴近真实生产行为。",
+          writingEyebrow: "相关文章",
+          writingTitle: "这些工作最终沉淀成了哪些文章",
+          writingCopy: "我希望 work 不只是经历陈列，也能直接把你带到更完整的技术与实践写作里。",
+          writingButton: "阅读文章",
+          browseWriting: "进入写作"
         };
 
   return (
@@ -58,6 +75,11 @@ export default async function WorkPage({
               {dictionary.work.pageTitle}
             </h1>
             <p className="hero-summary">{dictionary.work.overview}</p>
+            <div className="hero-actions">
+              <Link className="button-link button-link--secondary" href={`/${locale}/writing` as Route}>
+                {copy.browseWriting}
+              </Link>
+            </div>
           </div>
           <aside className="surface-card hero-panel">
             <div>
@@ -77,8 +99,8 @@ export default async function WorkPage({
                 <dd>{dictionary.work.themes.length}</dd>
               </div>
               <div className="hero-fact">
-                <dt>{locale === "en" ? "Roles" : "经历数"}</dt>
-                <dd>{dictionary.work.roles.length}</dd>
+                <dt>{locale === "en" ? "Linked essays" : "已连接文章"}</dt>
+                <dd>{relatedWriting.length}</dd>
               </div>
             </dl>
           </aside>
@@ -164,6 +186,31 @@ export default async function WorkPage({
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="site-shell section">
+        <div className="section-heading">
+          <div className="eyebrow">{copy.writingEyebrow}</div>
+          <h2 className="section-title">{copy.writingTitle}</h2>
+          <p className="section-copy">{copy.writingCopy}</p>
+        </div>
+        <div className="grid-3">
+          {relatedWriting.map((article) => (
+            <article key={article.slug} className="surface-card article-card article-card--linked">
+              <div className="article-card__meta">
+                <span>{article.category.title}</span>
+                <span className="pill">{article.series ? (locale === "en" ? "Series" : "专题") : copy.writingEyebrow}</span>
+              </div>
+              <h3>{article.title}</h3>
+              <p>{article.summary}</p>
+              <div className="article-card__actions">
+                <Link className="button-link button-link--secondary" href={getWritingHref(locale, article.slug) as Route}>
+                  {copy.writingButton}
+                </Link>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
     </>

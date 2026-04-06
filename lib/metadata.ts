@@ -4,8 +4,8 @@ import { type Locale } from "@/lib/i18n";
 export function getLocalizedMetadata(lang: Locale): Metadata {
   if (lang === "zh") {
     return {
-      title: "王宇峰",
-      description: "王宇峰的中英双语个人网站。"
+      title: "王豫丰",
+      description: "王豫丰的中英双语个人网站。"
     };
   }
 

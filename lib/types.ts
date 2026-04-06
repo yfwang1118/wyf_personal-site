@@ -32,11 +32,7 @@ export type ProfileContent = {
   selectedWork: Array<{
     title: string;
     summary: string;
-  }>;
-  featuredWriting: Array<{
-    title: string;
-    category: string;
-    summary: string;
+    relatedWritingSlug?: string;
   }>;
   contactLinks: ContactLink[];
 };
@@ -72,11 +68,14 @@ export type WorkContent = {
   }>;
 };
 
+export type WritingCategoryKey = "technical-writing" | "applied-notes" | "literary-creation";
+
 export type WritingEntry = {
   slug: string;
   title: string;
   summary: string;
-  category: "tech-essays" | "research-notes" | "literary-writing";
+  content: string[];
+  category: WritingCategoryKey;
   featured?: boolean;
 };
 
@@ -85,12 +84,14 @@ export type WritingSeriesArticle = {
   title: string;
   summary: string;
   content: string[];
+  featured?: boolean;
 };
 
 export type WritingSeries = {
   slug: string;
   title: string;
   description: string;
+  category: WritingCategoryKey;
   articles: WritingSeriesArticle[];
 };
 

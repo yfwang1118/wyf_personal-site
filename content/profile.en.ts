@@ -32,41 +32,22 @@ export const profileEn: ProfileContent = {
   ],
   selectedWork: [
     {
-      title: "Coding agent generalization",
+      title: "Turn badcases into executable, trainable, and verifiable loops",
       summary:
-        "Cross-scaffold optimization for coding agents, with unified task schema, evaluation interface, and real-task robustness analysis."
+        "I care less about patching one failure and more about converting it into task schema, sandbox replay, evaluation signal, and the next optimization step.",
+      relatedWritingSlug: "badcases-to-post-training-loops"
     },
     {
-      title: "Complex instruction following",
+      title: "Treat agent evaluation as diagnosis rather than completion-rate reporting",
       summary:
-        "Spec abstraction, constraint modeling, and judge-based evaluation pipelines for complex product-facing LLM tasks."
+        "A single score rarely explains a system problem. I care about where the failure sits and what evidence can guide the next iteration.",
+      relatedWritingSlug: "agent-evaluation-as-diagnosis"
     },
     {
-      title: "Distillation and efficient training",
+      title: "Translate task success back into capability measurement",
       summary:
-        "Distillation and turbo-style training experiments for smaller models, with attention to capacity limits and training efficiency."
-    }
-  ],
-  featuredWriting: [
-    {
-      title: "Agent evaluation as diagnosis, not just scoring",
-      category: "Tech Essay",
-      summary: "Why evaluation should reveal failure structure rather than flatten it into a single number."
-    },
-    {
-      title: "What coding agents learn from trajectory data",
-      category: "Tech Essay",
-      summary: "Notes on behavior traces, execution feedback, and where generalization actually comes from."
-    },
-    {
-      title: "Notes on capability measurement and structured OOD",
-      category: "Research Note",
-      summary: "Thinking about benchmarks as evidence, not just ranking devices."
-    },
-    {
-      title: "A reflective fragment",
-      category: "Literary / Personal",
-      summary: "A quieter layer of writing that sits beside the technical work."
+        "When a model scores highly on a complex task, I want to know what capability that really supports and what is only scaffold or environment effect.",
+      relatedWritingSlug: "measurement-view-1-score-is-not-capability"
     }
   ],
   contactLinks: [

@@ -1,6 +1,9 @@
+import type { Route } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/content";
 import { isValidLocale, type Locale } from "@/lib/i18n";
+import { getFeaturedWritingArticles, getWritingArticles, getWritingArticlesByCategory, getWritingHref } from "@/lib/writing";
 
 export default async function WritingPage({
   params
@@ -15,56 +18,67 @@ export default async function WritingPage({
 
   const locale = lang as Locale;
   const dictionary = getDictionary(locale);
-  const featuredEntries = dictionary.writing.entries.filter((entry) => entry.featured);
-  const series = dictionary.writing.series;
-  const seriesArticleCount = series.reduce((count, item) => count + item.articles.length, 0);
-  const writingTopics = dictionary.writing.categories.map((category) => ({
+  const allArticles = getWritingArticles(dictionary.writing);
+  const featuredArticles = getFeaturedWritingArticles(dictionary.writing);
+  const writingThemes = dictionary.writing.categories.map((category) => ({
     category,
-    entries: dictionary.writing.entries.filter((entry) => entry.category === category.key)
+    articles: getWritingArticlesByCategory(dictionary.writing, category.key)
   }));
   const copy =
     locale === "en"
       ? {
           overview: "Writing",
-          topicEyebrow: "Topics",
-          topicTitle: "Writing organized by recurring themes",
-          topicCopy:
-            "Instead of a flat archive, I think of writing as a few longer-running tracks. Each topic holds together a cluster of related questions.",
-          featuredEyebrow: "Featured",
-          featuredTitle: "A few pieces that represent the larger threads",
-          featuredCopy: "These are the entries that best capture how I currently think across technical and reflective writing.",
-          jumpFeatured: "Jump to featured",
-          jumpSeries: "Read series",
-          jumpTopics: "Browse topics",
-          totalEntries: "Entries",
-          totalTopics: "Topics",
-          totalSeries: "Series",
-          articleLabel: "Article",
+          themesEyebrow: "Themes",
+          themesTitle: "Writing organized around three durable tracks",
+          themesCopy:
+            "The structure here is intentional: technical writing, applied notes, and literary work should each have room to grow without collapsing into one undifferentiated archive.",
           seriesEyebrow: "Series",
-          seriesTitle: "Long-form thematic writing",
+          seriesTitle: "Long-form threads that unfold across multiple essays",
           seriesCopy:
-            "Some questions need more than standalone notes. These series are where I build an argument across multiple essays.",
-          seriesDescription: "Series overview"
+            "Series are where I want an argument to continue. They hold together a larger question rather than flattening it into one isolated post.",
+          featuredEyebrow: "Featured",
+          featuredTitle: "A few entry points into the larger body of writing",
+          featuredCopy:
+            "These are the pieces I would most likely reference from the homepage, work page, or future project notes.",
+          archiveEyebrow: "Archive",
+          archiveTitle: "Browse by theme",
+          archiveCopy: "Every article now has its own page, so the index can stay light and navigable.",
+          jumpSeries: "Read series",
+          jumpArchive: "Browse archive",
+          totalThemes: "Themes",
+          totalSeries: "Series",
+          totalArticles: "Article pages",
+          article: "Article",
+          featured: "Featured",
+          openArticle: "Read article",
+          seriesLabel: "Series",
+          seriesIntro: "Series overview"
         }
       : {
           overview: "写作",
-          topicEyebrow: "专题",
-          topicTitle: "按持续主题组织的写作结构",
-          topicCopy: "我不想把写作做成平铺归档，而更希望它像几条长期推进的主题线，每条线下挂着一组相关问题。",
+          themesEyebrow: "主题",
+          themesTitle: "围绕三条长期主线组织起来的写作",
+          themesCopy:
+            "这里的结构是有意为之的：技术写作、应用笔记和文学创作应该各自生长，而不是被压成一个没有区分度的归档页。",
+          seriesEyebrow: "专题",
+          seriesTitle: "适合被连续展开，而不是写成一篇就结束的问题",
+          seriesCopy: "专题页负责组织长期论证，单篇文章页负责承载具体文本。这样写作结构才足够清楚，也方便在别处引用。",
           featuredEyebrow: "精选",
-          featuredTitle: "几篇最能代表整体写作方向的文章",
-          featuredCopy: "这些文章更能体现我当前在技术写作和反思性写作上的整体判断。",
-          jumpFeatured: "查看精选",
-          jumpSeries: "查看专题写作",
-          jumpTopics: "查看专题",
-          totalEntries: "篇文章",
-          totalTopics: "个专题",
-          totalSeries: "个系列",
-          articleLabel: "文章",
-          seriesEyebrow: "专题写作",
-          seriesTitle: "按主题持续展开的长线写作",
-          seriesCopy: "有些问题不适合写成单篇短文，而更适合被组织成连续推进的专题。",
-          seriesDescription: "专题说明"
+          featuredTitle: "几个更适合作为入口的代表性文章",
+          featuredCopy: "这些文章更适合作为首页、work 页面和后续项目页里的引用入口。",
+          archiveEyebrow: "归档",
+          archiveTitle: "按主题浏览全部文章",
+          archiveCopy: "现在每篇文章都有独立页面，所以索引页可以保持轻量，只负责导航和组织。",
+          jumpSeries: "查看专题",
+          jumpArchive: "查看归档",
+          totalThemes: "个主题",
+          totalSeries: "个专题",
+          totalArticles: "篇文章页",
+          article: "文章",
+          featured: "精选",
+          openArticle: "阅读文章",
+          seriesLabel: "专题",
+          seriesIntro: "专题说明"
         };
 
   return (
@@ -78,38 +92,61 @@ export default async function WritingPage({
             </h1>
             <p className="hero-summary">{dictionary.writing.intro}</p>
             <div className="hero-actions">
-              <a className="button-link" href="#featured">
-                {copy.jumpFeatured}
-              </a>
-              <a className="button-link button-link--secondary" href="#series">
+              <a className="button-link" href="#series">
                 {copy.jumpSeries}
               </a>
-              <a className="button-link button-link--secondary" href="#topics">
-                {copy.jumpTopics}
+              <a className="button-link button-link--secondary" href="#archive">
+                {copy.jumpArchive}
               </a>
             </div>
           </div>
           <aside className="surface-card hero-panel">
             <div>
-              <div className="eyebrow">{copy.topicEyebrow}</div>
-              <h2 className="hero-panel__heading">{copy.topicTitle}</h2>
+              <div className="eyebrow">{copy.themesEyebrow}</div>
+              <h2 className="hero-panel__heading">{copy.themesTitle}</h2>
             </div>
-            <p className="hero-panel__copy">{copy.topicCopy}</p>
+            <p className="hero-panel__copy">{copy.themesCopy}</p>
             <dl className="hero-facts">
               <div className="hero-fact">
-                <dt>{copy.totalTopics}</dt>
+                <dt>{copy.totalThemes}</dt>
                 <dd>{dictionary.writing.categories.length}</dd>
               </div>
               <div className="hero-fact">
-                <dt>{copy.totalEntries}</dt>
-                <dd>{dictionary.writing.entries.length + seriesArticleCount}</dd>
+                <dt>{copy.totalSeries}</dt>
+                <dd>{dictionary.writing.series.length}</dd>
               </div>
               <div className="hero-fact">
-                <dt>{copy.totalSeries}</dt>
-                <dd>{series.length}</dd>
+                <dt>{copy.totalArticles}</dt>
+                <dd>{allArticles.length}</dd>
               </div>
             </dl>
           </aside>
+        </div>
+      </section>
+
+      <section className="site-shell section">
+        <div className="section-heading">
+          <div className="eyebrow">{copy.themesEyebrow}</div>
+          <h2 className="section-title">{copy.themesTitle}</h2>
+          <p className="section-copy">{copy.themesCopy}</p>
+        </div>
+        <div className="grid-3">
+          {writingThemes.map(({ category, articles }) => (
+            <article key={category.key} className="surface-card detail-card">
+              <div className="eyebrow">{category.title}</div>
+              <h3 className="detail-card__title">{category.title}</h3>
+              <p className="detail-card__copy">{category.description}</p>
+              <ul className="detail-card__list">
+                {articles.slice(0, 2).map((article) => (
+                  <li key={article.slug}>{article.title}</li>
+                ))}
+              </ul>
+              <div className="article-reference">
+                <span className="signal-list__label">{copy.totalArticles}</span>
+                <div>{articles.length}</div>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -120,30 +157,28 @@ export default async function WritingPage({
           <p className="section-copy">{copy.seriesCopy}</p>
         </div>
         <div className="panel-stack">
-          {series.map((item) => (
-            <section key={item.slug} className="surface-card topic-section">
+          {dictionary.writing.series.map((series) => (
+            <section key={series.slug} className="surface-card topic-section">
               <div className="topic-section__head">
-                <div className="eyebrow">{item.title}</div>
-                <h2>{item.title}</h2>
-                <p>{item.description}</p>
+                <div className="eyebrow">{series.title}</div>
+                <h2>{series.title}</h2>
+                <p>{series.description}</p>
               </div>
               <div className="article-list">
-                {item.articles.map((article, index) => (
+                {series.articles.map((article, index) => (
                   <article key={article.slug} className="article-card">
                     <div className="article-card__meta">
                       <span>
-                        {copy.articleLabel} 0{index + 1}
+                        {copy.article} 0{index + 1}
                       </span>
-                      <span className="pill">{copy.seriesDescription}</span>
+                      <span className="pill">{copy.seriesLabel}</span>
                     </div>
                     <h3>{article.title}</h3>
                     <p>{article.summary}</p>
-                    <div style={{ display: "grid", gap: "0.9rem", marginTop: "1.2rem" }}>
-                      {article.content.map((paragraph) => (
-                        <p key={paragraph} style={{ margin: 0 }}>
-                          {paragraph}
-                        </p>
-                      ))}
+                    <div className="article-card__actions">
+                      <Link className="button-link button-link--secondary" href={getWritingHref(locale, article.slug) as Route}>
+                        {copy.openArticle}
+                      </Link>
                     </div>
                   </article>
                 ))}
@@ -153,71 +188,61 @@ export default async function WritingPage({
         </div>
       </section>
 
-      <section className="site-shell section" id="topics">
-        <div className="section-heading">
-          <div className="eyebrow">{copy.topicEyebrow}</div>
-          <h2 className="section-title">{copy.topicTitle}</h2>
-          <p className="section-copy">{copy.topicCopy}</p>
-        </div>
-        <div className="topic-nav">
-          {writingTopics.map(({ category, entries }) => (
-            <a key={category.key} className="topic-nav__item" href={`#${category.key}`}>
-              <strong>{category.title}</strong>
-              <span>{category.description}</span>
-              <span style={{ marginTop: "0.75rem" }}>
-                {entries.length} {copy.totalEntries}
-              </span>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section className="site-shell section" id="featured">
+      <section className="site-shell section">
         <div className="section-heading">
           <div className="eyebrow">{copy.featuredEyebrow}</div>
           <h2 className="section-title">{copy.featuredTitle}</h2>
           <p className="section-copy">{copy.featuredCopy}</p>
         </div>
         <div className="featured-grid">
-          {featuredEntries.map((entry) => {
-            const category = dictionary.writing.categories.find((item) => item.key === entry.category);
-
-            return (
-              <article key={entry.slug} className="surface-card article-card">
-                <div className="article-card__meta">
-                  <span>{category?.title}</span>
-                  <span className="pill">{locale === "en" ? "Featured" : "精选"}</span>
-                </div>
-                <h3>{entry.title}</h3>
-                <p>{entry.summary}</p>
-              </article>
-            );
-          })}
+          {featuredArticles.map((article) => (
+            <article key={article.slug} className="surface-card article-card article-card--linked">
+              <div className="article-card__meta">
+                <span>{article.category.title}</span>
+                <span className="pill">{article.series ? copy.seriesLabel : copy.featured}</span>
+              </div>
+              <h3>{article.title}</h3>
+              <p>{article.summary}</p>
+              <div className="article-card__actions">
+                <Link className="button-link button-link--secondary" href={getWritingHref(locale, article.slug) as Route}>
+                  {copy.openArticle}
+                </Link>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
-      <section className="site-shell section">
+      <section className="site-shell section" id="archive">
+        <div className="section-heading">
+          <div className="eyebrow">{copy.archiveEyebrow}</div>
+          <h2 className="section-title">{copy.archiveTitle}</h2>
+          <p className="section-copy">{copy.archiveCopy}</p>
+        </div>
         <div className="panel-stack">
-          {writingTopics.map(({ category, entries }) => (
-            <section key={category.key} id={category.key} className="surface-card topic-section">
+          {writingThemes.map(({ category, articles }) => (
+            <section key={category.key} className="surface-card topic-section">
               <div className="topic-section__head">
                 <div className="eyebrow">{category.title}</div>
                 <h2>{category.title}</h2>
                 <p>{category.description}</p>
               </div>
               <div className="article-list">
-                {entries.map((entry, index) => (
-                  <article key={entry.slug} className="article-card">
+                {articles.map((article, index) => (
+                  <article key={article.slug} className="article-card">
                     <div className="article-card__meta">
                       <span>
-                        {copy.articleLabel} 0{index + 1}
+                        {copy.article} 0{index + 1}
                       </span>
-                      {entry.featured ? (
-                        <span className="pill">{locale === "en" ? "Featured" : "精选"}</span>
-                      ) : null}
+                      <span className="pill">{article.series ? copy.seriesLabel : category.title}</span>
                     </div>
-                    <h3>{entry.title}</h3>
-                    <p>{entry.summary}</p>
+                    <h3>{article.title}</h3>
+                    <p>{article.summary}</p>
+                    <div className="article-card__actions">
+                      <Link className="button-link button-link--secondary" href={getWritingHref(locale, article.slug) as Route}>
+                        {copy.openArticle}
+                      </Link>
+                    </div>
                   </article>
                 ))}
               </div>
