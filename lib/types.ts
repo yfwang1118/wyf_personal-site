@@ -80,6 +80,20 @@ export type WritingEntry = {
   featured?: boolean;
 };
 
+export type WritingSeriesArticle = {
+  slug: string;
+  title: string;
+  summary: string;
+  content: string[];
+};
+
+export type WritingSeries = {
+  slug: string;
+  title: string;
+  description: string;
+  articles: WritingSeriesArticle[];
+};
+
 export type WritingCategory = {
   key: WritingEntry["category"];
   title: string;
@@ -92,8 +106,10 @@ export type WritingContent = {
   sections: {
     categories: string;
     featured: string;
+    series: string;
   };
   categories: WritingCategory[];
+  series: WritingSeries[];
   entries: WritingEntry[];
 };
 

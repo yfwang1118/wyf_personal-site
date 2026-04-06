@@ -16,6 +16,8 @@ export default async function WritingPage({
   const locale = lang as Locale;
   const dictionary = getDictionary(locale);
   const featuredEntries = dictionary.writing.entries.filter((entry) => entry.featured);
+  const series = dictionary.writing.series;
+  const seriesArticleCount = series.reduce((count, item) => count + item.articles.length, 0);
   const writingTopics = dictionary.writing.categories.map((category) => ({
     category,
     entries: dictionary.writing.entries.filter((entry) => entry.category === category.key)
@@ -32,10 +34,17 @@ export default async function WritingPage({
           featuredTitle: "A few pieces that represent the larger threads",
           featuredCopy: "These are the entries that best capture how I currently think across technical and reflective writing.",
           jumpFeatured: "Jump to featured",
+          jumpSeries: "Read series",
           jumpTopics: "Browse topics",
           totalEntries: "Entries",
           totalTopics: "Topics",
-          articleLabel: "Article"
+          totalSeries: "Series",
+          articleLabel: "Article",
+          seriesEyebrow: "Series",
+          seriesTitle: "Long-form thematic writing",
+          seriesCopy:
+            "Some questions need more than standalone notes. These series are where I build an argument across multiple essays.",
+          seriesDescription: "Series overview"
         }
       : {
           overview: "写作",
@@ -46,10 +55,16 @@ export default async function WritingPage({
           featuredTitle: "几篇最能代表整体写作方向的文章",
           featuredCopy: "这些文章更能体现我当前在技术写作和反思性写作上的整体判断。",
           jumpFeatured: "查看精选",
+          jumpSeries: "查看专题写作",
           jumpTopics: "查看专题",
           totalEntries: "篇文章",
           totalTopics: "个专题",
-          articleLabel: "文章"
+          totalSeries: "个系列",
+          articleLabel: "文章",
+          seriesEyebrow: "专题写作",
+          seriesTitle: "按主题持续展开的长线写作",
+          seriesCopy: "有些问题不适合写成单篇短文，而更适合被组织成连续推进的专题。",
+          seriesDescription: "专题说明"
         };
 
   return (
@@ -65,6 +80,9 @@ export default async function WritingPage({
             <div className="hero-actions">
               <a className="button-link" href="#featured">
                 {copy.jumpFeatured}
+              </a>
+              <a className="button-link button-link--secondary" href="#series">
+                {copy.jumpSeries}
               </a>
               <a className="button-link button-link--secondary" href="#topics">
                 {copy.jumpTopics}
@@ -84,14 +102,54 @@ export default async function WritingPage({
               </div>
               <div className="hero-fact">
                 <dt>{copy.totalEntries}</dt>
-                <dd>{dictionary.writing.entries.length}</dd>
+                <dd>{dictionary.writing.entries.length + seriesArticleCount}</dd>
               </div>
               <div className="hero-fact">
-                <dt>{locale === "en" ? "Featured" : "精选"}</dt>
-                <dd>{featuredEntries.length}</dd>
+                <dt>{copy.totalSeries}</dt>
+                <dd>{series.length}</dd>
               </div>
             </dl>
           </aside>
+        </div>
+      </section>
+
+      <section className="site-shell section" id="series">
+        <div className="section-heading">
+          <div className="eyebrow">{copy.seriesEyebrow}</div>
+          <h2 className="section-title">{copy.seriesTitle}</h2>
+          <p className="section-copy">{copy.seriesCopy}</p>
+        </div>
+        <div className="panel-stack">
+          {series.map((item) => (
+            <section key={item.slug} className="surface-card topic-section">
+              <div className="topic-section__head">
+                <div className="eyebrow">{item.title}</div>
+                <h2>{item.title}</h2>
+                <p>{item.description}</p>
+              </div>
+              <div className="article-list">
+                {item.articles.map((article, index) => (
+                  <article key={article.slug} className="article-card">
+                    <div className="article-card__meta">
+                      <span>
+                        {copy.articleLabel} 0{index + 1}
+                      </span>
+                      <span className="pill">{copy.seriesDescription}</span>
+                    </div>
+                    <h3>{article.title}</h3>
+                    <p>{article.summary}</p>
+                    <div style={{ display: "grid", gap: "0.9rem", marginTop: "1.2rem" }}>
+                      {article.content.map((paragraph) => (
+                        <p key={paragraph} style={{ margin: 0 }}>
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       </section>
 
