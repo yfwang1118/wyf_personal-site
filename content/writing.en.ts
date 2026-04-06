@@ -52,4 +52,31 @@ export const writingEn: WritingContent = {
       summary: "Thinking about validity, evidence, and what benchmarks are supposed to show.",
       category: "research-notes",
       featured: true
-    },{
+    },
+    {
+      slug: "structured-ood-and-behavior-evidence",
+      title: "Structured OOD and behavior evidence in agent evaluation",
+      summary: "How to reason about transfer, mismatch, and observed behavior in evaluation design.",
+      category: "research-notes"
+    },
+    {
+      slug: "construct-validity-for-llm-benchmarks",
+      title: "Construct validity for LLM benchmarks",
+      summary: "A note on what exactly a benchmark claim is claiming.",
+      category: "research-notes"
+    },
+    {
+      slug: "selected-reflective-essay",
+      title: "A selected reflective essay",
+      summary: "A slower register of writing that complements the technical work.",
+      category: "literary-writing",
+      featured: true
+    },
+    {
+      slug: "fragment-and-prose-note",
+      title: "A literary fragment",
+      summary: "Short-form prose and reflective fragments.",
+      category: "literary-writing"
+    }
+  ]
+};
