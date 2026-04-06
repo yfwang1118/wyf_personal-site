@@ -6,7 +6,8 @@ export const writingEn: WritingContent = {
     "Writing is part of how I think. I write about LLM systems, evaluation, capability measurement, research papers, and occasionally more reflective or literary topics.",
   sections: {
     categories: "Writing categories",
-    featured: "Featured entries"
+    featured: "Featured entries",
+    series: "Series"
   },
   categories: [
     {
@@ -23,6 +24,28 @@ export const writingEn: WritingContent = {
       key: "literary-writing",
       title: "Literary / Personal Writing",
       description: "A curated secondary layer of reflective and literary writing."
+    }
+  ],
+  series: [
+    {
+      slug: "agent-capability-measurement-notes",
+      title: "Notes on Agent Capability Measurement",
+      description:
+        "This series is not mainly about building a harder benchmark. It starts from a more basic question: when a model scores highly on a complex task, can we really say it possesses a corresponding capability? I use benchmark design, construct validity, psychometrics, nomological networks, and structured OOD to rethink LLM and agent evaluation, and to reframe task success as latent capability measurement.",
+      articles: [
+        {
+          slug: "measurement-view-1-score-is-not-capability",
+          title:
+            "Measurement View (1): High scores are not high capability: complex agent evaluation does not mainly need harder tasks",
+          summary:
+            "The central gap in complex agent evaluation is not difficulty alone, but whether task scores can genuinely support capability claims.",
+          content: [
+            "This article argues that benchmark scores are not capabilities themselves. They are observations produced under specific task, metric, and environment choices.",
+            "The stronger the capability claim, the more we need to justify the link between latent capability, behavioral evidence, benchmark score, and real-world transfer.",
+            "The series will continue through evidence-centered design, construct validity, LLM psychometrics, nomological networks, and structured OOD."
+          ]
+        }
+      ]
     }
   ],
   entries: [
