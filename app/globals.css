@@ -428,8 +428,12 @@ main {
 .featured-grid,
 .topic-nav,
 .contact-grid,
-.series-grid {
+.series-grid--featured {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.series-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .article-list {
@@ -458,20 +462,10 @@ main {
 
 .writing-spotlight {
   display: grid;
-  gap: 1rem;
-}
-
-.writing-spotlight__stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.85rem;
+  padding: 1.25rem 1.35rem;
 }
 
-.series-preview {
-  padding-top: 0.5rem;
-}
-
-.series-preview h4,
 .series-card h3,
 .empty-state-card h3 {
   margin: 0;
@@ -479,11 +473,47 @@ main {
   line-height: 1.18;
 }
 
-.series-preview p,
 .series-card p,
 .empty-state-card p {
   margin: 0.7rem 0 0;
   color: var(--muted);
+}
+
+.series-card,
+.empty-state-card {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1.15rem 1.2rem;
+}
+
+.series-card--compact {
+  min-height: 100%;
+}
+
+.compact-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.1rem;
+}
+
+.compact-stat {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.38rem 0.68rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--muted-strong);
+  font-size: 0.88rem;
+  line-height: 1;
+}
+
+.series-card__list-label {
+  color: var(--muted);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .detail-card__index {
@@ -521,6 +551,15 @@ main {
   padding-top: 0.75rem;
   border-top: 1px solid var(--border);
   color: var(--muted-strong);
+}
+
+.series-card .detail-card__list {
+  margin-top: 0.35rem;
+  gap: 0.45rem;
+}
+
+.series-card .detail-card__list li {
+  padding-top: 0.55rem;
 }
 
 .split-layout {
@@ -856,7 +895,8 @@ main {
   .grid-3,
   .featured-grid,
   .contact-grid,
-  .series-grid {
+  .series-grid,
+  .series-grid--featured {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -912,16 +952,13 @@ main {
   .contact-grid,
   .topic-nav,
   .article-list,
-  .series-grid {
+  .series-grid,
+  .series-grid--featured {
     grid-template-columns: 1fr;
   }
 
   .timeline-card__meta {
     flex-direction: column;
-  }
-
-  .writing-spotlight__stats {
-    grid-template-columns: 1fr;
   }
 
   .essay-shell__meta {

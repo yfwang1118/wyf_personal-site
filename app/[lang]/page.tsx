@@ -34,7 +34,7 @@ export default async function HomePage({
   }));
   const primaryDirection = writingDirections.find((item) => item.category.key === "llm-ai") ?? writingDirections[0];
   const secondaryDirections = writingDirections.filter((item) => item.category.key !== primaryDirection.category.key);
-  const primarySeries = primaryDirection.series[0];
+  const featuredPrimarySeries = primaryDirection.series.slice(0, 3);
   const currentPractice = dictionary.profile.selectedWork.map((item) => ({
     ...item,
     article: item.relatedWritingSlug ? getWritingArticle(dictionary.writing, item.relatedWritingSlug) : undefined
@@ -59,8 +59,10 @@ export default async function HomePage({
             "The homepage should not flatten all writing into three equal cards. LLM / AI is the main body of work, while philosophy / issues and literary writing stay visible as secondary but durable tracks.",
           writingButton: "Open writing",
           primaryTrack: "Primary track",
-          primarySeries: "Core series",
+          keySeries: "Key series",
+          representativeArticles: "Representative essays",
           seriesLabel: "Series",
+          featuredSeries: "Featured series",
           openSeries: "Open series",
           openDirection: "Open direction",
           seriesCount: "Series",
@@ -96,8 +98,10 @@ export default async function HomePage({
             "我不想把三类写作平均摊开。主页里，LLM / AI 应该作为主区被优先看见；哲学 / 议题与文学创作则作为另外两条长期线被保留下来。",
           writingButton: "进入写作",
           primaryTrack: "核心主线",
-          primarySeries: "当前重点专题",
+          keySeries: "重点专题",
+          representativeArticles: "代表文章",
           seriesLabel: "专题",
+          featuredSeries: "重点专题",
           openSeries: "进入专题",
           openDirection: "查看方向",
           seriesCount: "个专题",
@@ -211,36 +215,20 @@ export default async function HomePage({
               {primaryDirection.category.title}
             </h3>
             <p className="detail-card__copy">{primaryDirection.category.description}</p>
-            <div className="writing-spotlight__stats">
-              <div className="essay-shell__meta-item">
-                <span className="signal-list__label">{homeCopy.seriesCount}</span>
-                <div>{primaryDirection.series.length}</div>
-              </div>
-              <div className="essay-shell__meta-item">
-                <span className="signal-list__label">{homeCopy.articleCount}</span>
-                <div>{primaryDirection.articles.length}</div>
-              </div>
+            <div className="compact-stats">
+              <span className="compact-stat">
+                {primaryDirection.series.length} {homeCopy.seriesCount}
+              </span>
+              <span className="compact-stat">
+                {primaryDirection.articles.length} {homeCopy.articleCount}
+              </span>
+              <span className="compact-stat">{homeCopy.primaryTrack}</span>
             </div>
-            {primarySeries ? (
-              <div className="series-preview">
-                <span className="signal-list__label">{homeCopy.primarySeries}</span>
-                <h4>{primarySeries.title}</h4>
-                <p>{primarySeries.description}</p>
-                <ul className="detail-card__list">
-                  {primarySeries.articles.slice(0, 3).map((article) => (
-                    <li key={article.slug}>{article.title}</li>
-                  ))}
-                </ul>
-                <div className="hero-actions" style={{ marginTop: "1.4rem" }}>
-                  <Link className="button-link" href={getWritingSeriesHref(locale, primarySeries.slug) as Route}>
-                    {homeCopy.openSeries}
-                  </Link>
-                  <Link className="button-link button-link--secondary" href={`/${locale}/writing` as Route}>
-                    {homeCopy.writingButton}
-                  </Link>
-                </div>
-              </div>
-            ) : null}
+            <div className="article-card__actions">
+              <Link className="button-link" href={`/${locale}/writing` as Route}>
+                {homeCopy.writingButton}
+              </Link>
+            </div>
           </article>
 
           <div className="panel-stack">
@@ -259,15 +247,13 @@ export default async function HomePage({
                   <p className="detail-card__copy">
                     {representativeSeries?.description ?? item.category.description}
                   </p>
-                  <div className="writing-spotlight__stats">
-                    <div className="essay-shell__meta-item">
-                      <span className="signal-list__label">{homeCopy.seriesCount}</span>
-                      <div>{item.series.length}</div>
-                    </div>
-                    <div className="essay-shell__meta-item">
-                      <span className="signal-list__label">{homeCopy.articleCount}</span>
-                      <div>{item.articles.length}</div>
-                    </div>
+                  <div className="compact-stats">
+                    <span className="compact-stat">
+                      {item.series.length} {homeCopy.seriesCount}
+                    </span>
+                    <span className="compact-stat">
+                      {item.articles.length} {homeCopy.articleCount}
+                    </span>
                   </div>
                   <div className="article-card__actions">
                     {representativeSeries ? (
@@ -284,6 +270,39 @@ export default async function HomePage({
               );
             })}
           </div>
+        </div>
+        {featuredPrimarySeries.length > 0 ? (
+          <div className="section-heading" style={{ marginTop: "2.4rem", marginBottom: "1.2rem" }}>
+            <div className="eyebrow">{homeCopy.featuredSeries}</div>
+            <h3 className="detail-card__title" style={{ marginTop: 0 }}>
+              {primaryDirection.category.title}
+            </h3>
+          </div>
+        ) : null}
+        <div className="series-grid series-grid--featured">
+          {featuredPrimarySeries.map((series) => (
+            <article key={series.slug} className="surface-card series-card series-card--compact">
+              <div className="article-card__meta">
+                <span>{homeCopy.keySeries}</span>
+                <span className="pill">
+                  {series.articles.length} {homeCopy.articleCount}
+                </span>
+              </div>
+              <h3>{series.title}</h3>
+              <p>{series.description}</p>
+              <div className="series-card__list-label">{homeCopy.representativeArticles}</div>
+              <ul className="detail-card__list">
+                {series.articles.slice(0, 2).map((article) => (
+                  <li key={article.slug}>{article.title}</li>
+                ))}
+              </ul>
+              <div className="article-card__actions">
+                <Link className="button-link button-link--secondary" href={getWritingSeriesHref(locale, series.slug) as Route}>
+                  {homeCopy.openSeries}
+                </Link>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
