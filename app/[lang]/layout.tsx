@@ -48,7 +48,7 @@ export default async function LocaleLayout({
         navigation={dictionary.navigation}
         profile={dictionary.profile}
       />
-      <main>{children}</main>
+      <main className="page-main">{children}</main>
       <SiteFooter lang={locale} profile={dictionary.profile} />
     </PageShell>
   );

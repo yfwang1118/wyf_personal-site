@@ -11,12 +11,26 @@ type LanguageSwitcherProps = {
 
 export function LanguageSwitcher({ currentLang }: LanguageSwitcherProps) {
   const pathname = usePathname();
-  const nextLang = currentLang === "en" ? "zh" : "en";
-  const switchedPath = pathname.replace(`/${currentLang}`, `/${nextLang}`) as Route;
+  const basePath = pathname ?? `/${currentLang}`;
+  const buildPath = (lang: Locale) =>
+    (basePath.match(/^\/(en|zh)(?=\/|$)/)
+      ? basePath.replace(/^\/(en|zh)(?=\/|$)/, `/${lang}`)
+      : `/${lang}`) as Route;
 
   return (
-    <Link href={switchedPath} style={{ fontSize: "0.95rem", color: "var(--muted)" }}>
-      {currentLang === "en" ? "中文" : "EN"}
-    </Link>
+    <div className="language-switcher" aria-label={currentLang === "en" ? "Language switcher" : "语言切换"}>
+      <Link
+        href={buildPath("en")}
+        className={`language-switcher__link${currentLang === "en" ? " is-current" : ""}`}
+      >
+        EN
+      </Link>
+      <Link
+        href={buildPath("zh")}
+        className={`language-switcher__link${currentLang === "zh" ? " is-current" : ""}`}
+      >
+        中文
+      </Link>
+    </div>
   );
 }

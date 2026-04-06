@@ -13,20 +13,160 @@ export default async function WritingPage({
     notFound();
   }
 
-  const dictionary = getDictionary(lang as Locale);
+  const locale = lang as Locale;
+  const dictionary = getDictionary(locale);
+  const featuredEntries = dictionary.writing.entries.filter((entry) => entry.featured);
+  const writingTopics = dictionary.writing.categories.map((category) => ({
+    category,
+    entries: dictionary.writing.entries.filter((entry) => entry.category === category.key)
+  }));
+  const copy =
+    locale === "en"
+      ? {
+          overview: "Writing",
+          topicEyebrow: "Topics",
+          topicTitle: "Writing organized by recurring themes",
+          topicCopy:
+            "Instead of a flat archive, I think of writing as a few longer-running tracks. Each topic holds together a cluster of related questions.",
+          featuredEyebrow: "Featured",
+          featuredTitle: "A few pieces that represent the larger threads",
+          featuredCopy: "These are the entries that best capture how I currently think across technical and reflective writing.",
+          jumpFeatured: "Jump to featured",
+          jumpTopics: "Browse topics",
+          totalEntries: "Entries",
+          totalTopics: "Topics",
+          articleLabel: "Article"
+        }
+      : {
+          overview: "写作",
+          topicEyebrow: "专题",
+          topicTitle: "按持续主题组织的写作结构",
+          topicCopy: "我不想把写作做成平铺归档，而更希望它像几条长期推进的主题线，每条线下挂着一组相关问题。",
+          featuredEyebrow: "精选",
+          featuredTitle: "几篇最能代表整体写作方向的文章",
+          featuredCopy: "这些文章更能体现我当前在技术写作和反思性写作上的整体判断。",
+          jumpFeatured: "查看精选",
+          jumpTopics: "查看专题",
+          totalEntries: "篇文章",
+          totalTopics: "个专题",
+          articleLabel: "文章"
+        };
 
   return (
-    <section className="site-shell" style={{ padding: "4rem 0 6rem" }}>
-      <h1>{dictionary.writing.pageTitle}</h1>
-      <p className="muted" style={{ maxWidth: "44rem" }}>
-        {dictionary.writing.intro}
-      </p>
-      <div className="surface" style={{ marginTop: "2rem", padding: "1.5rem", borderRadius: "1rem" }}>
-        <strong>{dictionary.writing.sections.categories}</strong>
-        <p style={{ marginBottom: 0 }}>
-          Category schema is in place for Tech Essays, Research Notes, and Literary / Personal Writing.
-        </p>
-      </div>
-    </section>
+    <>
+      <section className="site-shell section section--hero">
+        <div className="hero-grid">
+          <div>
+            <div className="eyebrow">{copy.overview}</div>
+            <h1 className="section-title" style={{ fontSize: "clamp(2.8rem, 7vw, 5rem)" }}>
+              {dictionary.writing.pageTitle}
+            </h1>
+            <p className="hero-summary">{dictionary.writing.intro}</p>
+            <div className="hero-actions">
+              <a className="button-link" href="#featured">
+                {copy.jumpFeatured}
+              </a>
+              <a className="button-link button-link--secondary" href="#topics">
+                {copy.jumpTopics}
+              </a>
+            </div>
+          </div>
+          <aside className="surface-card hero-panel">
+            <div>
+              <div className="eyebrow">{copy.topicEyebrow}</div>
+              <h2 className="hero-panel__heading">{copy.topicTitle}</h2>
+            </div>
+            <p className="hero-panel__copy">{copy.topicCopy}</p>
+            <dl className="hero-facts">
+              <div className="hero-fact">
+                <dt>{copy.totalTopics}</dt>
+                <dd>{dictionary.writing.categories.length}</dd>
+              </div>
+              <div className="hero-fact">
+                <dt>{copy.totalEntries}</dt>
+                <dd>{dictionary.writing.entries.length}</dd>
+              </div>
+              <div className="hero-fact">
+                <dt>{locale === "en" ? "Featured" : "精选"}</dt>
+                <dd>{featuredEntries.length}</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <section className="site-shell section" id="topics">
+        <div className="section-heading">
+          <div className="eyebrow">{copy.topicEyebrow}</div>
+          <h2 className="section-title">{copy.topicTitle}</h2>
+          <p className="section-copy">{copy.topicCopy}</p>
+        </div>
+        <div className="topic-nav">
+          {writingTopics.map(({ category, entries }) => (
+            <a key={category.key} className="topic-nav__item" href={`#${category.key}`}>
+              <strong>{category.title}</strong>
+              <span>{category.description}</span>
+              <span style={{ marginTop: "0.75rem" }}>
+                {entries.length} {copy.totalEntries}
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="site-shell section" id="featured">
+        <div className="section-heading">
+          <div className="eyebrow">{copy.featuredEyebrow}</div>
+          <h2 className="section-title">{copy.featuredTitle}</h2>
+          <p className="section-copy">{copy.featuredCopy}</p>
+        </div>
+        <div className="featured-grid">
+          {featuredEntries.map((entry) => {
+            const category = dictionary.writing.categories.find((item) => item.key === entry.category);
+
+            return (
+              <article key={entry.slug} className="surface-card article-card">
+                <div className="article-card__meta">
+                  <span>{category?.title}</span>
+                  <span className="pill">{locale === "en" ? "Featured" : "精选"}</span>
+                </div>
+                <h3>{entry.title}</h3>
+                <p>{entry.summary}</p>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="site-shell section">
+        <div className="panel-stack">
+          {writingTopics.map(({ category, entries }) => (
+            <section key={category.key} id={category.key} className="surface-card topic-section">
+              <div className="topic-section__head">
+                <div className="eyebrow">{category.title}</div>
+                <h2>{category.title}</h2>
+                <p>{category.description}</p>
+              </div>
+              <div className="article-list">
+                {entries.map((entry, index) => (
+                  <article key={entry.slug} className="article-card">
+                    <div className="article-card__meta">
+                      <span>
+                        {copy.articleLabel} 0{index + 1}
+                      </span>
+                      {entry.featured ? (
+                        <span className="pill">{locale === "en" ? "Featured" : "精选"}</span>
+                      ) : null}
+                    </div>
+                    <h3>{entry.title}</h3>
+                    <p>{entry.summary}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }

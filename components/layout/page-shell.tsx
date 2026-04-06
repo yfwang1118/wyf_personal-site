@@ -3,5 +3,11 @@ export function PageShell({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <div style={{ paddingBottom: "3rem" }}>{children}</div>;
+  return (
+    <div className="page-shell">
+      <div className="page-shell__orb page-shell__orb--one" />
+      <div className="page-shell__orb page-shell__orb--two" />
+      {children}
+    </div>
+  );
 }
