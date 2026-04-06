@@ -3,7 +3,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/content";
 import { isValidLocale, type Locale } from "@/lib/i18n";
-import { getWritingArticle, getWritingArticles, getWritingArticlesByCategory, getWritingHref } from "@/lib/writing";
+import {
+  getWritingArticle,
+  getWritingArticles,
+  getWritingArticlesByCategory,
+  getWritingHref,
+  getWritingSeries,
+  getWritingSeriesHref,
+  getWritingSeriesItem
+} from "@/lib/writing";
 
 export function generateStaticParams() {
   const locales: Locale[] = ["en", "zh"];
@@ -35,33 +43,39 @@ export default async function WritingArticlePage({
     notFound();
   }
 
-  const relatedArticles = article.series
-    ? getWritingArticlesByCategory(dictionary.writing, article.category.key).filter(
-        (item) => item.slug !== article.slug
+  const currentSeries = article.series ? getWritingSeriesItem(dictionary.writing, article.series.slug) : undefined;
+  const relatedArticles = currentSeries
+    ? getWritingArticles(dictionary.writing).filter(
+        (item) => item.series?.slug === currentSeries.slug && item.slug !== article.slug
       )
     : getWritingArticlesByCategory(dictionary.writing, article.category.key).filter((item) => item.slug !== article.slug);
+  const relatedSeries = getWritingSeries(dictionary.writing)
+    .filter((item) => item.category.key === article.category.key && item.slug !== currentSeries?.slug)
+    .slice(0, 3);
   const copy =
     locale === "en"
       ? {
           backToWriting: "Back to writing",
-          backToWork: "See work",
+          backToSeries: "Back to series",
           relatedEyebrow: "Related",
           relatedTitle: "Continue from here",
           relatedCopy:
-            "Each article page should be linkable and reusable, so related pieces stay close instead of getting buried in the index.",
+            "Article pages should remain attached to the larger structure, so the surrounding series and nearby essays are visible from the reading page.",
           openArticle: "Read article",
+          openSeries: "Open series",
           inSeries: "Series",
-          category: "Theme"
+          category: "Direction"
         }
       : {
           backToWriting: "返回写作页",
-          backToWork: "查看 work",
+          backToSeries: "返回专题页",
           relatedEyebrow: "延伸阅读",
           relatedTitle: "从这里继续往下读",
-          relatedCopy: "现在每篇文章都可以被单独引用，所以相关内容会直接挂在文章页下面，而不是埋在索引里。",
+          relatedCopy: "文章页不应该和整体结构断开，所以从正文页也应该能顺手回到专题，并继续沿着附近内容阅读。",
           openArticle: "阅读文章",
+          openSeries: "进入专题",
           inSeries: "专题",
-          category: "主题"
+          category: "方向"
         };
 
   return (
@@ -82,11 +96,13 @@ export default async function WritingArticlePage({
           </h1>
           <p className="hero-summary">{article.summary}</p>
           <div className="hero-actions">
+            {article.series ? (
+              <Link className="button-link" href={getWritingSeriesHref(locale, article.series.slug) as Route}>
+                {copy.backToSeries}
+              </Link>
+            ) : null}
             <Link className="button-link button-link--secondary" href={`/${locale}/writing` as Route}>
               {copy.backToWriting}
-            </Link>
-            <Link className="button-link button-link--secondary" href={`/${locale}/work` as Route}>
-              {copy.backToWork}
             </Link>
           </div>
         </div>
@@ -114,7 +130,7 @@ export default async function WritingArticlePage({
         </article>
       </section>
 
-      {relatedArticles.length > 0 ? (
+      {relatedArticles.length > 0 || relatedSeries.length > 0 ? (
         <section className="site-shell section">
           <div className="section-heading">
             <div className="eyebrow">{copy.relatedEyebrow}</div>
@@ -137,6 +153,23 @@ export default async function WritingArticlePage({
                 </div>
               </article>
             ))}
+            {relatedArticles.length === 0
+              ? relatedSeries.map((item) => (
+                  <article key={item.slug} className="surface-card article-card article-card--linked">
+                    <div className="article-card__meta">
+                      <span>{item.category.title}</span>
+                      <span className="pill">{copy.inSeries}</span>
+                    </div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <div className="article-card__actions">
+                      <Link className="button-link button-link--secondary" href={getWritingSeriesHref(locale, item.slug) as Route}>
+                        {copy.openSeries}
+                      </Link>
+                    </div>
+                  </article>
+                ))
+              : null}
           </div>
         </section>
       ) : null}

@@ -3,7 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/content";
 import { isValidLocale, type Locale } from "@/lib/i18n";
-import { getFeaturedWritingArticles, getWritingArticle, getWritingArticles, getWritingArticlesByCategory, getWritingHref } from "@/lib/writing";
+import {
+  getWritingArticle,
+  getWritingArticles,
+  getWritingArticlesByCategory,
+  getWritingSeriesByCategory,
+  getWritingSeriesHref,
+  getWritingHref
+} from "@/lib/writing";
 
 export default async function HomePage({
   params
@@ -20,16 +27,14 @@ export default async function HomePage({
   const dictionary = getDictionary(locale);
   const currentRole = dictionary.work.roles[0];
   const allWritingArticles = getWritingArticles(dictionary.writing);
-  const featuredArticles = getFeaturedWritingArticles(dictionary.writing);
-  const writingHighlights = dictionary.writing.categories
-    .map((category) => {
-      const article =
-        featuredArticles.find((item) => item.category.key === category.key) ??
-        getWritingArticlesByCategory(dictionary.writing, category.key)[0];
-
-      return article;
-    })
-    .filter((article) => article !== undefined);
+  const writingDirections = dictionary.writing.categories.map((category) => ({
+    category,
+    series: getWritingSeriesByCategory(dictionary.writing, category.key),
+    articles: getWritingArticlesByCategory(dictionary.writing, category.key)
+  }));
+  const primaryDirection = writingDirections.find((item) => item.category.key === "llm-ai") ?? writingDirections[0];
+  const secondaryDirections = writingDirections.filter((item) => item.category.key !== primaryDirection.category.key);
+  const primarySeries = primaryDirection.series[0];
   const currentPractice = dictionary.profile.selectedWork.map((item) => ({
     ...item,
     article: item.relatedWritingSlug ? getWritingArticle(dictionary.writing, item.relatedWritingSlug) : undefined
@@ -41,7 +46,7 @@ export default async function HomePage({
           current: "Current role",
           focus: "Focus",
           writing: "Writing",
-          categories: "Themes",
+          categories: "Directions",
           heroPrimary: "Browse writing",
           heroSecondary: "See work",
           focusEyebrow: "Core areas",
@@ -49,10 +54,18 @@ export default async function HomePage({
           focusCopy:
             "The common thread is translating messy real-task behavior into systems that can be trained, measured, and iterated on.",
           writingEyebrow: "Writing",
-          writingTitle: "Technical, applied, and literary work kept in one place",
+          writingTitle: "Make the LLM / AI track the clear primary line on the homepage",
           writingCopy:
-            "Each theme now leads to standalone article pages, so writing can be cited from the homepage, the work page, and future project notes.",
+            "The homepage should not flatten all writing into three equal cards. LLM / AI is the main body of work, while philosophy / issues and literary writing stay visible as secondary but durable tracks.",
           writingButton: "Open writing",
+          primaryTrack: "Primary track",
+          primarySeries: "Core series",
+          seriesLabel: "Series",
+          openSeries: "Open series",
+          openDirection: "Open direction",
+          seriesCount: "Series",
+          articleCount: "Articles",
+          upcoming: "In preparation",
           practiceEyebrow: "Current practice",
           practiceTitle: "What the work actually looks like right now",
           practiceCopy:
@@ -64,9 +77,6 @@ export default async function HomePage({
           contactCopy:
             "I am most interested in conversations around post-training systems, coding agents, evaluation design, and writing about AI systems.",
           contactButton: "Contact",
-          featured: "Featured",
-          series: "Series",
-          article: "Article",
           totalArticles: "Article pages"
         }
       : {
@@ -74,16 +84,25 @@ export default async function HomePage({
           current: "当前角色",
           focus: "聚焦方向",
           writing: "写作",
-          categories: "主题",
+          categories: "方向",
           heroPrimary: "进入写作",
           heroSecondary: "查看工作",
           focusEyebrow: "核心方向",
           focusTitle: "我会反复回到的几类问题",
           focusCopy: "它们背后的共同主题，是把真实任务中的复杂行为翻译成可训练、可测量、可持续迭代的系统问题。",
-          writingEyebrow: "写作",
-          writingTitle: "把技术、应用和文学创作放进同一套写作结构里",
-          writingCopy: "现在每篇文章都有独立页面，首页、work 页和后续项目页都可以直接引用，不再只是停留在一个平铺列表里。",
-          writingButton: "打开写作页",
+          writingEyebrow: "写作结构",
+          writingTitle: "主页上，LLM / AI 应该是最明确的主线",
+          writingCopy:
+            "我不想把三类写作平均摊开。主页里，LLM / AI 应该作为主区被优先看见；哲学 / 议题与文学创作则作为另外两条长期线被保留下来。",
+          writingButton: "进入写作",
+          primaryTrack: "核心主线",
+          primarySeries: "当前重点专题",
+          seriesLabel: "专题",
+          openSeries: "进入专题",
+          openDirection: "查看方向",
+          seriesCount: "个专题",
+          articleCount: "篇文章",
+          upcoming: "专题整理中",
           practiceEyebrow: "当前实践",
           practiceTitle: "我现在真正长期在做的几条工作线",
           practiceCopy: "与其把 work 展开成很多抽象卡片，我更愿意把它压缩成几条具体的问题链，并直接连到对应文章。",
@@ -93,9 +112,6 @@ export default async function HomePage({
           contactTitle: "如果方向重合，欢迎直接交流",
           contactCopy: "我最愿意聊的话题是后训练系统、Coding Agent、评测设计，以及如何书写 AI 系统。",
           contactButton: "联系",
-          featured: "精选",
-          series: "专题",
-          article: "文章页",
           totalArticles: "篇文章页"
         };
 
@@ -185,22 +201,89 @@ export default async function HomePage({
           <h2 className="section-title">{homeCopy.writingTitle}</h2>
           <p className="section-copy">{homeCopy.writingCopy}</p>
         </div>
-        <div className="grid-3">
-          {writingHighlights.map((article) => (
-            <article key={article.slug} className="surface-card article-card article-card--linked">
-              <div className="article-card__meta">
-                <span>{article.category.title}</span>
-                <span className="pill">{article.series ? homeCopy.series : homeCopy.featured}</span>
+        <div className="writing-home-layout">
+          <article className="surface-card writing-spotlight">
+            <div className="article-card__meta">
+              <span>{primaryDirection.category.title}</span>
+              <span className="pill">{homeCopy.primaryTrack}</span>
+            </div>
+            <h3 className="detail-card__title" style={{ marginTop: 0 }}>
+              {primaryDirection.category.title}
+            </h3>
+            <p className="detail-card__copy">{primaryDirection.category.description}</p>
+            <div className="writing-spotlight__stats">
+              <div className="essay-shell__meta-item">
+                <span className="signal-list__label">{homeCopy.seriesCount}</span>
+                <div>{primaryDirection.series.length}</div>
               </div>
-              <h3>{article.title}</h3>
-              <p>{article.summary}</p>
-              <div className="article-card__actions">
-                <Link className="button-link button-link--secondary" href={getWritingHref(locale, article.slug) as Route}>
-                  {homeCopy.writingButton}
-                </Link>
+              <div className="essay-shell__meta-item">
+                <span className="signal-list__label">{homeCopy.articleCount}</span>
+                <div>{primaryDirection.articles.length}</div>
               </div>
-            </article>
-          ))}
+            </div>
+            {primarySeries ? (
+              <div className="series-preview">
+                <span className="signal-list__label">{homeCopy.primarySeries}</span>
+                <h4>{primarySeries.title}</h4>
+                <p>{primarySeries.description}</p>
+                <ul className="detail-card__list">
+                  {primarySeries.articles.slice(0, 3).map((article) => (
+                    <li key={article.slug}>{article.title}</li>
+                  ))}
+                </ul>
+                <div className="hero-actions" style={{ marginTop: "1.4rem" }}>
+                  <Link className="button-link" href={getWritingSeriesHref(locale, primarySeries.slug) as Route}>
+                    {homeCopy.openSeries}
+                  </Link>
+                  <Link className="button-link button-link--secondary" href={`/${locale}/writing` as Route}>
+                    {homeCopy.writingButton}
+                  </Link>
+                </div>
+              </div>
+            ) : null}
+          </article>
+
+          <div className="panel-stack">
+            {secondaryDirections.map((item) => {
+              const representativeSeries = item.series[0];
+
+              return (
+                <article key={item.category.key} className="surface-card detail-card">
+                  <div className="article-card__meta">
+                    <span>{item.category.title}</span>
+                    <span className="pill">{representativeSeries ? homeCopy.seriesLabel : homeCopy.upcoming}</span>
+                  </div>
+                  <h3 className="detail-card__title" style={{ marginTop: 0 }}>
+                    {representativeSeries?.title ?? item.category.title}
+                  </h3>
+                  <p className="detail-card__copy">
+                    {representativeSeries?.description ?? item.category.description}
+                  </p>
+                  <div className="writing-spotlight__stats">
+                    <div className="essay-shell__meta-item">
+                      <span className="signal-list__label">{homeCopy.seriesCount}</span>
+                      <div>{item.series.length}</div>
+                    </div>
+                    <div className="essay-shell__meta-item">
+                      <span className="signal-list__label">{homeCopy.articleCount}</span>
+                      <div>{item.articles.length}</div>
+                    </div>
+                  </div>
+                  <div className="article-card__actions">
+                    {representativeSeries ? (
+                      <Link className="button-link button-link--secondary" href={getWritingSeriesHref(locale, representativeSeries.slug) as Route}>
+                        {homeCopy.openDirection}
+                      </Link>
+                    ) : (
+                      <a className="button-link button-link--secondary" href={`/${locale}/writing#${item.category.key}`}>
+                        {homeCopy.openDirection}
+                      </a>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 

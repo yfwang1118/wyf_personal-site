@@ -68,7 +68,7 @@ export type WorkContent = {
   }>;
 };
 
-export type WritingCategoryKey = "technical-writing" | "applied-notes" | "literary-creation";
+export type WritingCategoryKey = "llm-ai" | "philosophy-issues" | "literary-creation";
 
 export type WritingEntry = {
   slug: string;
