@@ -34,9 +34,9 @@ export default async function WritingPage({
       ? {
           overview: "Writing",
           directionsEyebrow: "Directions",
-          directionsTitle: "A writing map built from directions, then series, then articles",
+          directionsTitle: "Writing organized by direction and then by series",
           directionsCopy:
-            "This page should act as a map rather than a flat archive. The top level is direction, the middle level is series, and individual article pages carry the full text.",
+            "The structure here is simple: three long-running directions, each broken into series, with standalone article pages carrying the full text.",
           jumpPrimary: "See LLM / AI",
           jumpDirections: "Browse directions",
           totalDirections: "Directions",
@@ -52,9 +52,9 @@ export default async function WritingPage({
       : {
           overview: "写作",
           directionsEyebrow: "方向",
-          directionsTitle: "先是方向，再是专题，最后才是文章",
+          directionsTitle: "先按方向组织，再按专题展开",
           directionsCopy:
-            "这里应该更像一张写作地图，而不是文章列表。最上层是写作方向，中间层是专题，正文则放在每篇独立文章页里。",
+            "这里不是按时间堆叠的博客页，而是一张写作地图：最上层是三条长期方向，中间层是专题，正文则放在每篇独立文章页里。",
           jumpPrimary: "查看 LLM / AI",
           jumpDirections: "浏览全部方向",
           totalDirections: "个方向",
@@ -86,7 +86,7 @@ export default async function WritingPage({
               </a>
             </div>
           </div>
-          <aside className="surface-card hero-panel">
+          <aside className="surface-card editorial-card hero-panel">
             <div>
               <div className="eyebrow">{copy.directionsEyebrow}</div>
               <h2 className="hero-panel__heading">{copy.directionsTitle}</h2>
@@ -118,7 +118,7 @@ export default async function WritingPage({
         </div>
         <div className="grid-3">
           {writingDirections.map((item) => (
-            <a key={item.category.key} className="topic-nav__item" href={`#${item.category.key}`}>
+            <a key={item.category.key} className="topic-nav__item topic-nav__item--editorial" href={`#${item.category.key}`}>
               <strong>{item.category.title}</strong>
               <span>{item.category.description}</span>
               <span style={{ marginTop: "0.75rem" }}>
@@ -132,7 +132,7 @@ export default async function WritingPage({
       <section className="site-shell section">
         <div className="panel-stack">
           {writingDirections.map((item) => (
-            <section key={item.category.key} id={item.category.key} className="surface-card topic-section">
+            <section key={item.category.key} id={item.category.key} className="surface-card editorial-card topic-section">
               <div className="topic-section__head">
                 <div className="eyebrow">{item.category.title}</div>
                 <h2>{item.category.title}</h2>
@@ -141,7 +141,7 @@ export default async function WritingPage({
               {item.series.length > 0 ? (
                 <div className="series-grid">
                   {item.series.map((series) => (
-                    <article key={series.slug} className="surface-card series-card">
+                    <article key={series.slug} className="surface-card editorial-card series-card series-card--dense">
                       <div className="article-card__meta">
                         <span>{copy.latestSeries}</span>
                         <span className="pill">
@@ -158,7 +158,7 @@ export default async function WritingPage({
                         </ul>
                       ) : null}
                       <div className="article-card__actions">
-                        <Link className="button-link button-link--secondary" href={getWritingSeriesHref(locale, series.slug) as Route}>
+                        <Link className="text-link" href={getWritingSeriesHref(locale, series.slug) as Route}>
                           {copy.openSeries}
                         </Link>
                       </div>
@@ -166,7 +166,7 @@ export default async function WritingPage({
                   ))}
                 </div>
               ) : (
-                <div className="surface-card empty-state-card">
+                <div className="surface-card editorial-card empty-state-card">
                   <div className="eyebrow">{copy.noSeries}</div>
                   <h3>{item.category.title}</h3>
                   <p>{copy.noSeriesCopy}</p>

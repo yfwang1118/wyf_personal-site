@@ -54,9 +54,9 @@ export default async function HomePage({
           focusCopy:
             "The common thread is translating messy real-task behavior into systems that can be trained, measured, and iterated on.",
           writingEyebrow: "Writing",
-          writingTitle: "Make the LLM / AI track the clear primary line on the homepage",
+          writingTitle: "Long-form writing on LLMs, agents, evaluation, and capability",
           writingCopy:
-            "The homepage should not flatten all writing into three equal cards. LLM / AI is the main body of work, while philosophy / issues and literary writing stay visible as secondary but durable tracks.",
+            "This is the primary writing track: work on real systems, benchmark design, capability measurement, and agent behavior. Philosophy and literary writing remain present, but they sit behind this main line.",
           writingButton: "Open writing",
           primaryTrack: "Primary track",
           keySeries: "Key series",
@@ -93,9 +93,9 @@ export default async function HomePage({
           focusTitle: "我会反复回到的几类问题",
           focusCopy: "它们背后的共同主题，是把真实任务中的复杂行为翻译成可训练、可测量、可持续迭代的系统问题。",
           writingEyebrow: "写作结构",
-          writingTitle: "主页上，LLM / AI 应该是最明确的主线",
+          writingTitle: "围绕 LLM、Agent、评测与能力测量的长期写作",
           writingCopy:
-            "我不想把三类写作平均摊开。主页里，LLM / AI 应该作为主区被优先看见；哲学 / 议题与文学创作则作为另外两条长期线被保留下来。",
+            "这是我当前最核心的一条写作主线，关心真实系统、评测方法、能力判断和 Agent 行为。哲学 / 议题与文学创作会继续保留，但不会盖过这条主轴。",
           writingButton: "进入写作",
           primaryTrack: "核心主线",
           keySeries: "重点专题",
@@ -206,7 +206,7 @@ export default async function HomePage({
           <p className="section-copy">{homeCopy.writingCopy}</p>
         </div>
         <div className="writing-home-layout">
-          <article className="surface-card writing-spotlight">
+          <article className="surface-card editorial-card writing-spotlight">
             <div className="article-card__meta">
               <span>{primaryDirection.category.title}</span>
               <span className="pill">{homeCopy.primaryTrack}</span>
@@ -236,7 +236,7 @@ export default async function HomePage({
               const representativeSeries = item.series[0];
 
               return (
-                <article key={item.category.key} className="surface-card detail-card">
+                <article key={item.category.key} className="surface-card editorial-card detail-card detail-card--compact">
                   <div className="article-card__meta">
                     <span>{item.category.title}</span>
                     <span className="pill">{representativeSeries ? homeCopy.seriesLabel : homeCopy.upcoming}</span>
@@ -257,11 +257,11 @@ export default async function HomePage({
                   </div>
                   <div className="article-card__actions">
                     {representativeSeries ? (
-                      <Link className="button-link button-link--secondary" href={getWritingSeriesHref(locale, representativeSeries.slug) as Route}>
+                      <Link className="text-link" href={getWritingSeriesHref(locale, representativeSeries.slug) as Route}>
                         {homeCopy.openDirection}
                       </Link>
                     ) : (
-                      <a className="button-link button-link--secondary" href={`/${locale}/writing#${item.category.key}`}>
+                      <a className="text-link" href={`/${locale}/writing#${item.category.key}`}>
                         {homeCopy.openDirection}
                       </a>
                     )}
@@ -281,7 +281,7 @@ export default async function HomePage({
         ) : null}
         <div className="series-grid series-grid--featured">
           {featuredPrimarySeries.map((series) => (
-            <article key={series.slug} className="surface-card series-card series-card--compact">
+            <article key={series.slug} className="surface-card editorial-card series-card series-card--compact">
               <div className="article-card__meta">
                 <span>{homeCopy.keySeries}</span>
                 <span className="pill">
@@ -297,7 +297,7 @@ export default async function HomePage({
                 ))}
               </ul>
               <div className="article-card__actions">
-                <Link className="button-link button-link--secondary" href={getWritingSeriesHref(locale, series.slug) as Route}>
+                <Link className="text-link" href={getWritingSeriesHref(locale, series.slug) as Route}>
                   {homeCopy.openSeries}
                 </Link>
               </div>
